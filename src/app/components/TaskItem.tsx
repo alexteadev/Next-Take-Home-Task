@@ -5,16 +5,17 @@ import { useRouter } from "next/navigation";
 import { HiOutlineTrash } from "react-icons/hi";
 import { useDispatch } from "react-redux";
 import { Task } from "../types/task";
-import { setSelectedTask } from "@/store/taskSlice";
 import TaskCheckbox from "./TaskCheckbox";
 import DeleteConfirmation from "./DeleteConfirmation";
+import { setSelectedTask, updateTask } from "@/store/taskSlice";
 
 interface TaskItemProps {
   task: Task;
   onTaskDelete: (id: number) => void;
+  onTaskUpdate: (id: number, updatedTask: Partial<Task>) => void;
 }
 
-export default function TaskItem({ task, onTaskDelete }: TaskItemProps) {
+export default function TaskItem({ task, onTaskDelete, onTaskUpdate }: TaskItemProps) {
   const dispatch = useDispatch();
   const router = useRouter();
   const [isCompleted, setIsCompleted] = useState(task.completed);
@@ -35,6 +36,8 @@ export default function TaskItem({ task, onTaskDelete }: TaskItemProps) {
         body: JSON.stringify({ completed: !isCompleted }),
       });
       setIsCompleted(!isCompleted);
+      onTaskUpdate(task.id, { completed: !isCompleted });
+      dispatch(updateTask({ id: task.id, updatedTask: { completed: !isCompleted } }));
     } catch (error) {
       console.error("Failed to toggle task completion:", error);
     }

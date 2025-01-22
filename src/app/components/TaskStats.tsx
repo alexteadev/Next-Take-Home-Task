@@ -1,10 +1,10 @@
-import { Task } from "../types/task";
+"use client";
 
-interface TaskStatsProps {
-  tasks: Task[];
-}
+import { RootState } from "@/store";
+import { useSelector } from "react-redux";
 
-export default function TaskStats({ tasks }: TaskStatsProps) {
+export default function TaskStats() {
+  const tasks = useSelector((state: RootState) => state.task.tasks);
   const completedTasks = tasks.filter((task) => task.completed).length;
 
   return (

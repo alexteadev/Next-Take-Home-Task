@@ -2,16 +2,20 @@
 
 import { useRouter } from "next/navigation";
 import { HiCheck, HiOutlineTrash } from "react-icons/hi";
+import { useDispatch } from "react-redux";
 import { Task } from "../types/task";
+import { setSelectedTask } from "@/store/taskSlice";
 
 interface TaskItemProps {
   task: Task;
 }
 
 export default function TaskItem({ task }: TaskItemProps) {
+  const dispatch = useDispatch();
   const router = useRouter();
 
   const handleTaskClick = () => {
+    dispatch(setSelectedTask(task));
     router.push(`/edit`);
   };
 

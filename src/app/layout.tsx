@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import StoreProvider from "@/providers/StoreProvider";
 
 export const metadata: Metadata = {
   title: "Todo App",
@@ -14,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-black text-white font-sans antialiased">
-        {children}
+        <StoreProvider>{children}</StoreProvider>
       </body>
     </html>
   );

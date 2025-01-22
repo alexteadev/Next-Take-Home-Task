@@ -1,43 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 import Button from "@/components/Button";
 
 const COLORS = ["red", "orange", "yellow", "green", "blue", "purple", "brown"];
 
-interface EditFormProps {
-  taskId: string;
-}
-
-export default function EditForm({ taskId }: EditFormProps) {
-  const [title, setTitle] = useState("");
-  const [selectedColor, setSelectedColor] = useState(COLORS[0]);
+export default function EditForm() {
+  const task = useSelector((state: RootState) => state.task.selectedTask);
+  const [title, setTitle] = useState(task?.title || "");
+  const [selectedColor, setSelectedColor] = useState(task?.color || COLORS[0]);
+  const [error, setError] = useState("");
   const router = useRouter();
-
-  useEffect(() => {
-    const fetchTask = async () => {
-      try {
-        const response = await fetch(`http://localhost:3001/api/tasks/${taskId}`);
-        const data = await response.json();
-        setTitle(data.title);
-        setSelectedColor(data.color);
-      } catch (error) {
-        console.error("Failed to fetch task:", error);
-      }
-    };
-
-    fetchTask();
-  }, [taskId]);
 
   const handleSubmit = async () => {
     if (!title.trim()) {
-      alert("Title is required");
+      setError("Title is required");
       return;
     }
 
     try {
-      await fetch(`http://localhost:3001/api/tasks/${taskId}`, {
+      await fetch(`http://localhost:3001/api/tasks/${task?.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -48,8 +33,13 @@ export default function EditForm({ taskId }: EditFormProps) {
       router.push("/");
     } catch (error) {
       console.error("Failed to update task:", error);
+      setError("Failed to update task");
     }
   };
+
+  if (!task) {
+    return <p className="text-white text-lg">No task selected.</p>;
+  }
 
   return (
     <form className="flex flex-col gap-6">
@@ -62,6 +52,8 @@ export default function EditForm({ taskId }: EditFormProps) {
           onChange={(e) => setTitle(e.target.value)}
         />
       </label>
+
+      {error && <p className="text-red-500 text-sm">{error}</p>}
 
       <div>
         <span className="block text-gray-400 text-lg font-semibold mb-2">Color</span>

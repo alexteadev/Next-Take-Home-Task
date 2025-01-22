@@ -1,58 +1,89 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { HiCheck, HiOutlineTrash } from "react-icons/hi";
+import { HiOutlineTrash } from "react-icons/hi";
 import { useDispatch } from "react-redux";
 import { Task } from "../types/task";
 import { setSelectedTask } from "@/store/taskSlice";
+import TaskCheckbox from "./TaskCheckbox";
+import DeleteConfirmation from "./DeleteConfirmation";
 
 interface TaskItemProps {
   task: Task;
+  onTaskDelete: (id: number) => void;
 }
 
-export default function TaskItem({ task }: TaskItemProps) {
+export default function TaskItem({ task, onTaskDelete }: TaskItemProps) {
   const dispatch = useDispatch();
   const router = useRouter();
+  const [isCompleted, setIsCompleted] = useState(task.completed);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   const handleTaskClick = () => {
     dispatch(setSelectedTask(task));
     router.push(`/edit`);
   };
 
-  return (
-    <li
-      onClick={handleTaskClick}
-      className="flex justify-between items-center bg-[#2A2A2A] rounded-lg p-4 shadow-lg cursor-pointer hover:bg-[#3A3A3A] transition"
-    >
-      <div className="flex items-center gap-4">
-        <label className="relative flex items-center justify-center w-6 h-6 cursor-pointer">
-          <input
-            type="checkbox"
-            className="sr-only peer"
-            defaultChecked={task.completed}
-            onClick={(e) => e.stopPropagation()}
-          />
-          <span className="absolute w-full h-full rounded-full border-2 border-blue-500 peer-checked:border-indigo-500"></span>
-          <HiCheck className="w-4 h-4 text-indigo-500 hidden peer-checked:block" />
-        </label>
+  const toggleCompletion = async () => {
+    try {
+      await fetch(`http://localhost:3001/api/tasks/${task.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ completed: !isCompleted }),
+      });
+      setIsCompleted(!isCompleted);
+    } catch (error) {
+      console.error("Failed to toggle task completion:", error);
+    }
+  };
 
-        <p
-          className={`text-sm ${
-            task.completed ? "line-through text-gray-500" : "text-white"
-          }`}
-        >
-          {task.title}
-        </p>
-      </div>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          console.log("Delete task:", task.id);
-        }}
-        className="text-gray-500 hover:text-red-500"
+  const handleDelete = async () => {
+    try {
+      await fetch(`http://localhost:3001/api/tasks/${task.id}`, {
+        method: "DELETE",
+      });
+      onTaskDelete(task.id);
+      setShowConfirmation(false);
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+    }
+  };
+
+  return (
+    <>
+      <li
+        onClick={handleTaskClick}
+        className="flex justify-between items-center bg-[#2A2A2A] rounded-lg p-4 shadow-lg cursor-pointer hover:bg-[#3A3A3A] transition"
       >
-        <HiOutlineTrash size={24} />
-      </button>
-    </li>
+        <div className="flex items-center gap-4">
+          <TaskCheckbox completed={isCompleted} onToggle={toggleCompletion} />
+          <p
+            className={`text-sm ${
+              isCompleted ? "line-through text-gray-500" : "text-white"
+            }`}
+          >
+            {task.title}
+          </p>
+        </div>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowConfirmation(true);
+          }}
+          className="text-gray-500 hover:text-red-500"
+        >
+          <HiOutlineTrash size={24} />
+        </button>
+      </li>
+      {showConfirmation && (
+        <DeleteConfirmation
+          onConfirm={handleDelete}
+          onCancel={() => setShowConfirmation(false)}
+        />
+      )}
+    </>
   );
 }

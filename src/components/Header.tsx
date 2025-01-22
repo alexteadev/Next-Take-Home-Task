@@ -9,7 +9,7 @@ interface HeaderProps {
 
 export default function Header({ showButton = true, onButtonClick }: HeaderProps) {
   return (
-    <div className="w-full bg-[#0D0D0D] flex flex-col items-center relative">
+    <div className="w-full bg-[#0D0D0D] flex flex-col items-center relative h-48">
       <div className="flex flex-row items-center gap-6 py-12">
         <Image
           src="/assets/logo.png"

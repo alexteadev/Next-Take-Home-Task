@@ -5,13 +5,12 @@ import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import Button from "@/components/Button";
-
-const COLORS = ["red", "orange", "yellow", "green", "blue", "purple", "brown"];
+import ColorPicker from "@/components/ColorPicker";
 
 export default function EditForm() {
   const task = useSelector((state: RootState) => state.task.selectedTask);
   const [title, setTitle] = useState(task?.title || "");
-  const [selectedColor, setSelectedColor] = useState(task?.color || COLORS[0]);
+  const [selectedColor, setSelectedColor] = useState(task?.color || "red");
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -57,19 +56,7 @@ export default function EditForm() {
 
       <div>
         <span className="block text-gray-400 text-lg font-semibold mb-2">Color</span>
-        <div className="flex gap-4">
-          {COLORS.map((color) => (
-            <button
-              key={color}
-              type="button"
-              onClick={() => setSelectedColor(color)}
-              className={`w-12 h-12 rounded-full ${
-                color === selectedColor ? "ring-4 ring-white" : ""
-              }`}
-              style={{ backgroundColor: color }}
-            ></button>
-          ))}
-        </div>
+        <ColorPicker selectedColor={selectedColor} onSelect={setSelectedColor} />
       </div>
 
       <Button onClick={handleSubmit} className="mt-8">

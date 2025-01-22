@@ -3,12 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
-
-const COLORS = ["red", "orange", "yellow", "green", "blue", "purple", "brown"];
+import ColorPicker from "@/components/ColorPicker";
 
 export default function CreateForm() {
   const [title, setTitle] = useState("");
-  const [selectedColor, setSelectedColor] = useState(COLORS[0]);
+  const [selectedColor, setSelectedColor] = useState("red");
   const router = useRouter();
 
   const handleSubmit = async () => {
@@ -47,19 +46,7 @@ export default function CreateForm() {
 
       <div>
         <span className="block text-gray-400 text-lg font-semibold mb-2">Color</span>
-        <div className="flex gap-4">
-          {COLORS.map((color) => (
-            <button
-              key={color}
-              type="button"
-              onClick={() => setSelectedColor(color)}
-              className={`w-12 h-12 rounded-full ${
-                color === selectedColor ? "ring-4 ring-white" : ""
-              }`}
-              style={{ backgroundColor: color }}
-            ></button>
-          ))}
-        </div>
+        <ColorPicker selectedColor={selectedColor} onSelect={setSelectedColor} />
       </div>
 
       <Button onClick={handleSubmit} className="mt-8">

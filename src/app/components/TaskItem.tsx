@@ -8,6 +8,7 @@ import { Task } from "../types/task";
 import TaskCheckbox from "./TaskCheckbox";
 import DeleteConfirmation from "./DeleteConfirmation";
 import { setSelectedTask, updateTask } from "@/store/taskSlice";
+import API_URL from "@/utils/api";
 
 interface TaskItemProps {
   task: Task;
@@ -28,7 +29,7 @@ export default function TaskItem({ task, onTaskDelete, onTaskUpdate }: TaskItemP
 
   const toggleCompletion = async () => {
     try {
-      await fetch(`http://localhost:3001/api/tasks/${task.id}`, {
+      await fetch(`${API_URL}/tasks/${task.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -45,7 +46,7 @@ export default function TaskItem({ task, onTaskDelete, onTaskUpdate }: TaskItemP
 
   const handleDelete = async () => {
     try {
-      await fetch(`http://localhost:3001/api/tasks/${task.id}`, {
+      await fetch(`${API_URL}/tasks/${task.id}`, {
         method: "DELETE",
       });
       onTaskDelete(task.id);

@@ -33,13 +33,10 @@ const taskSlice = createSlice({
     setSelectedTask: (state, action: PayloadAction<Task>) => {
       state.selectedTask = action.payload;
     },
-    clearSelectedTask: (state) => {
-      state.selectedTask = null;
-    },
   },
 });
 
-export const { setTasks, addTask, updateTask, deleteTask, setSelectedTask, clearSelectedTask } =
+export const { setTasks, addTask, updateTask, deleteTask, setSelectedTask } =
   taskSlice.actions;
 
 export const taskReducer = taskSlice.reducer;

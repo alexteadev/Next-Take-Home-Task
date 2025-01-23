@@ -10,15 +10,15 @@ export default function TaskStats() {
   return (
     <div className="flex justify-between items-center w-[46rem] text-white mb-4">
       <div className="flex items-center gap-2">
-        <span className="text-blue-500 font-bold text-lg">Tasks</span>
+        <span className="text-[#4EA8DE] font-bold text-lg">Tasks</span>
         <span className="bg-gray-700 text-white text-sm font-medium px-3 py-1 rounded-full">
           {tasks.length}
         </span>
       </div>
       <div className="flex items-center gap-2">
-        <span className="text-indigo-500 font-bold text-lg">Completed</span>
+        <span className="text-[#8284FA] font-bold text-lg">Completed</span>
         <span className="bg-gray-700 text-white text-sm font-medium px-3 py-1 rounded-full">
-          {completedTasks} of {tasks.length}
+          {tasks.length === 0 ? tasks.length : `${completedTasks} of ${tasks.length}`}
         </span>
       </div>
     </div>

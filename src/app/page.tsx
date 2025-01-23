@@ -9,6 +9,7 @@ import TaskStats from "./components/TaskStats";
 import TaskList from "./components/TaskList";
 import Header from "@/components/Header";
 import EmptyState from "./components/EmptyState";
+import API_URL from "@/utils/api";
 
 export default function Home() {
   const tasks = useSelector((state: RootState) => state.task.tasks);
@@ -18,7 +19,7 @@ export default function Home() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await fetch("http://localhost:3001/api/tasks");
+        const response = await fetch(`${API_URL}/tasks`);
         const data = await response.json();
         dispatch(setTasks(data));
       } catch (error) {

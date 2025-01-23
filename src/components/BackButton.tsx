@@ -10,7 +10,7 @@ export default function BackButton() {
     <button
       type="button"
       onClick={() => router.push("/")}
-      className="text-blue-500 hover:text-blue-400 transition"
+      className="text-white hover:text-gray-200 transition"
     >
       <HiOutlineArrowLeft className="w-6 h-6" />
     </button>

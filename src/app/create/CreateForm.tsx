@@ -1,23 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
 import ColorPicker from "@/components/ColorPicker";
+import { HiOutlinePlusCircle } from "react-icons/hi";
+import API_URL from "@/utils/api";
 
 export default function CreateForm() {
   const [title, setTitle] = useState("");
   const [selectedColor, setSelectedColor] = useState("red");
-  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async () => {
+    setError(null);
+
     if (!title.trim()) {
-      alert("Title is required");
+      setError("Title is required");
       return;
     }
 
     try {
-      await fetch("http://localhost:3001/api/tasks", {
+      const response = await fetch(`${API_URL}/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -25,15 +29,23 @@ export default function CreateForm() {
         body: JSON.stringify({ title, color: selectedColor, completed: false }),
       });
 
-      router.push("/");
+      if (!response.ok) {
+        throw new Error("Failed to create task");
+      }
+
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+      }, 2000);
     } catch (error) {
       console.error("Failed to create task:", error);
+      setError("Failed to create task");
     }
   };
 
   return (
-    <form className="flex flex-col gap-6">
-      <label className="block text-gray-400 text-lg font-semibold">
+    <div className="flex flex-col gap-6">
+      <label className="block text-[#4EA8DE] text-lg font-semibold">
         Title
         <input
           type="text"
@@ -44,14 +56,17 @@ export default function CreateForm() {
         />
       </label>
 
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {success && <p className="text-green-500 text-sm">Task created successfully!</p>}
+
       <div>
-        <span className="block text-gray-400 text-lg font-semibold mb-2">Color</span>
+        <span className="block text-[#4EA8DE] text-lg font-semibold mb-2">Color</span>
         <ColorPicker selectedColor={selectedColor} onSelect={setSelectedColor} />
       </div>
 
       <Button onClick={handleSubmit} className="mt-8">
-        Add Task
+        Add Task <HiOutlinePlusCircle />
       </Button>
-    </form>
+    </div>
   );
 }

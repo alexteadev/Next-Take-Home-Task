@@ -1,18 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
 import Button from "@/components/Button";
 import ColorPicker from "@/components/ColorPicker";
+import { updateTask } from "@/store/taskSlice";
+import { HiOutlineCheck } from "react-icons/hi";
+import API_URL from "@/utils/api";
 
 export default function EditForm() {
   const task = useSelector((state: RootState) => state.task.selectedTask);
+  const dispatch = useDispatch();
   const [title, setTitle] = useState(task?.title || "");
   const [selectedColor, setSelectedColor] = useState(task?.color || "red");
   const [error, setError] = useState("");
-  const router = useRouter();
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async () => {
     if (!title.trim()) {
@@ -21,7 +24,7 @@ export default function EditForm() {
     }
 
     try {
-      await fetch(`http://localhost:3001/api/tasks/${task?.id}`, {
+      const response = await fetch(`${API_URL}/tasks/${task?.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -29,7 +32,14 @@ export default function EditForm() {
         body: JSON.stringify({ title, color: selectedColor }),
       });
 
-      router.push("/");
+      if (!response.ok) {
+        throw new Error("Failed to update task");
+      }
+
+      const updatedTask = await response.json();
+      dispatch(updateTask({ id: updatedTask.id, updatedTask }));
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
     } catch (error) {
       console.error("Failed to update task:", error);
       setError("Failed to update task");
@@ -41,8 +51,8 @@ export default function EditForm() {
   }
 
   return (
-    <form className="flex flex-col gap-6">
-      <label className="block text-gray-400 text-lg font-semibold">
+    <div className="flex flex-col gap-6">
+      <label className="block text-[#4EA8DE] text-lg font-semibold">
         Title
         <input
           type="text"
@@ -53,15 +63,16 @@ export default function EditForm() {
       </label>
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
+      {success && <p className="text-green-500 text-sm">Task updated successfully!</p>}
 
       <div>
-        <span className="block text-gray-400 text-lg font-semibold mb-2">Color</span>
+        <span className="block text-[#4EA8DE] text-lg font-semibold mb-2">Color</span>
         <ColorPicker selectedColor={selectedColor} onSelect={setSelectedColor} />
       </div>
 
       <Button onClick={handleSubmit} className="mt-8">
-        Save
+        Save <HiOutlineCheck />
       </Button>
-    </form>
+    </div>
   );
 }
